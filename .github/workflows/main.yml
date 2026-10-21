@@ -1,0 +1,37 @@
+name: Extract ENOCH Website
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract website ZIP
+        run: |
+          unzip -o enochs-home-cleanup-fresh-website.zip -d extracted
+
+          cp -R extracted/app .
+          cp extracted/package.json .
+          cp extracted/tsconfig.json .
+          cp extracted/next-env.d.ts .
+          cp extracted/next.config.ts .
+          cp extracted/README.md .
+
+          rm -rf extracted
+          rm -f enochs-home-cleanup-fresh-website.zip
+
+      - name: Commit website files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Extract ENOCH HOME CLEANUP website" || echo "Nothing to commit"
+          git push
